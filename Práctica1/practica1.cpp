@@ -1,3 +1,6 @@
+// Lab 01. Modular Arithmetic
+// By: López Reyes José Roberto. 6CV2.
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -99,79 +102,131 @@ string decipher(string C, int K){
     return M;
 }
 
-int main() {
-    srand(time(0));
+// English Alphabet Test
+void testEnglishAlphabet() {
+    alphabetVector.clear();
+    alphabetMap.clear();
 
-    // Generating the random numbers to test the multiplication table
-    int x = selectEven();
-    int y = selectOdd();
-    int z = primeNum.at(rand() % primeNum.size());
-
-    // Generating three different tables
-    mulTable(x);
-    mulTable(y);
-    mulTable(z);
-
-    cout << "-----------------------\n";
-
-    // Testing Ciphering and Deciphering
-
-    // First C/D test: English Alphabet
     string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    
-    for (int i=0; i<alphabet.size(); i++) {
+    for (int i = 0; i < alphabet.size(); i++) {
         alphabetVector.push_back(alphabet[i]);
         alphabetMap[alphabet[i]] = i;
     }
 
-    string M = "ROBERT";
-    int K = 14;
+    cin.ignore();
+    string M, C;
+    int K;
 
-    string C = encipher(M, K);
+    cout << "Please insert your plaintext: ";
+    getline(cin, M);
 
-    cout << "Plain Text: " << M << "\n";
-    cout << "Key: " << K << "\n";
-    cout << "Ciphered Text: " << C << "\n";
+    cout << "Please insert your key: ";
+    cin >> K;
 
-    cout << "-----------------------\n";
+    C = encipher(M, K);
+    cout << "Plain Text: " << M << "\nKey: " << K << "\nCiphered Text: " << C << "\n";
 
-    C = "FCPSFH";
-    K = 14;
+    cin.ignore();
+    cout << "Please insert your ciphered text: ";
+    getline(cin, C);
 
     M = decipher(C, K);
-    
-    cout << "Ciphered Text: " << C << "\n";
-    cout << "Key: " << K << "\n";
-    cout << "Decipheared Text: " << M << "\n";
+    cout << "Ciphered Text: " << C << "\nKey: " << K << "\nDeciphered Text: " << M << "\n";
+    cout << "-----------------------\n";
+}
 
-    // Second C/D test: ASCII Character Code
-    alphabetMap.clear();
+// Printable ASCII Alphabet
+void testASCIIAlphabet() {
     alphabetVector.clear();
+    alphabetMap.clear();
 
     for (int i = 32; i < 127; i++) {
-        alphabetVector.push_back((char)i); 
+        alphabetVector.push_back((char)i);
         alphabetMap[(char)i] = alphabetVector.size() - 1;
     }
 
-    M = "Hello, World! This is another test message for the shift cipher using ASCII characters.";
-    K = 14;
+    cin.ignore();
+    string M, C;
+    int K;
+
+    cout << "Please insert your plaintext: ";
+    getline(cin, M);
+
+    cout << "Please insert your key: ";
+    cin >> K;
 
     C = encipher(M, K);
+    cout << "Plain Text: " << M << "\nKey: " << K << "\nCiphered Text: " << C << "\n";
 
-    cout << "Plain Text: " << M << "\n";
-    cout << "Key: " << K << "\n";
-    cout << "Ciphered Text: " << C << "\n";
+    cin.ignore();
+    cout << "Please insert your ciphered text: ";
+    getline(cin, C);
+
+    M = decipher(C, K);
+    cout << "Ciphered Text: " << C << "\nKey: " << K << "\nDeciphered Text: " << M << "\n";
+    cout << "-----------------------\n";
+}
+
+// Random Alphabet Test
+void testRandomAlphabet() {
+    alphabetVector.clear();
+    alphabetMap.clear();
+
+    int n;
+    cout << "Please insert your desired alphabet size: ";
+    cin >> n;
+    cout << "\n";
+
+    char r;
+    for (int i = 0; i < n; i++) {
+        do {
+            r = (char)(rand() % (127 - 32 + 1) + 32);
+        } while (alphabetMap.find(r) != alphabetMap.end());
+
+        alphabetVector.push_back(r);
+        alphabetMap[r] = alphabetVector.size() - 1;
+    }
+
+    cout << "Alphabet: ";
+    for (auto c : alphabetVector) cout << c;
+    cout << "\n-----------------------\n";
+
+    cin.ignore();
+    string M, C;
+    int K;
+
+    cout << "Please insert your plaintext: ";
+    getline(cin, M);
+
+    cout << "Please insert your key: ";
+    cin >> K;
+
+    C = encipher(M, K);
+    cout << "Plain Text: " << M << "\nKey: " << K << "\nCiphered Text: " << C << "\n";
+
+    cin.ignore();
+    cout << "Please insert your ciphered text: ";
+    getline(cin, C);
+
+    M = decipher(C, K);
+    cout << "Ciphered Text: " << C << "\nKey: " << K << "\nDeciphered Text: " << M << "\n";
+    cout << "-----------------------\n";
+}
+
+int main() {
+    srand(time(0));
+
+    // Multiplication Tables
+    mulTable(selectEven());
+    mulTable(selectOdd());
+    mulTable(primeNum[rand() % primeNum.size()]);
 
     cout << "-----------------------\n";
 
-    C = "Vszz}:.e}!zr/.bvw.w.o|}#vs!.#s#.{s""ous.t}!.#vs.vwt#.qw~vs!.$w|u.OaQWW.qvo!oq#s!<";
-    K = 14;
-
-    M = decipher(C, K);
-    
-    cout << "Ciphered Text: " << C << "\n";
-    cout << "Key: " << K << "\n";
-    cout << "Decipheared Text: " << M << "\n";
+    // Run all tests
+    testEnglishAlphabet();
+    testASCIIAlphabet();
+    testRandomAlphabet();
 
     return 0;
 }
