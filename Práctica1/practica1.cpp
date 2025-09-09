@@ -124,7 +124,7 @@ int main() {
         alphabetMap[alphabet[i]] = i;
     }
 
-    string M = "SILVIA";
+    string M = "ROBERT";
     int K = 14;
 
     string C = encipher(M, K);
@@ -135,7 +135,7 @@ int main() {
 
     cout << "-----------------------\n";
 
-    string C2 = "GWZJWO";
+    string C2 = "FCPSFH";
     int K2 = 14;
 
     string M2 = decipher(C2, K2);
