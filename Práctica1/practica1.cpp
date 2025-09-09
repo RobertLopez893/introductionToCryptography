@@ -119,7 +119,7 @@ int main() {
     // First C/D test: English Alphabet
     string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     
-    for (int i=0; i<alphabet.size(); ++i) {
+    for (int i=0; i<alphabet.size(); i++) {
         alphabetVector.push_back(alphabet[i]);
         alphabetMap[alphabet[i]] = i;
     }
@@ -135,14 +135,43 @@ int main() {
 
     cout << "-----------------------\n";
 
-    string C2 = "FCPSFH";
-    int K2 = 14;
+    C = "FCPSFH";
+    K = 14;
 
-    string M2 = decipher(C2, K2);
+    M = decipher(C, K);
     
-    cout << "Ciphered Text: " << C2 << "\n";
-    cout << "Key: " << K2 << "\n";
-    cout << "Decipheared Text: " << M2 << "\n";
+    cout << "Ciphered Text: " << C << "\n";
+    cout << "Key: " << K << "\n";
+    cout << "Decipheared Text: " << M << "\n";
+
+    // Second C/D test: ASCII Character Code
+    alphabetMap.clear();
+    alphabetVector.clear();
+
+    for (int i = 32; i < 127; i++) {
+        alphabetVector.push_back((char)i); 
+        alphabetMap[(char)i] = alphabetVector.size() - 1;
+    }
+
+    M = "Hello, World! This is another test message for the shift cipher using ASCII characters.";
+    K = 14;
+
+    C = encipher(M, K);
+
+    cout << "Plain Text: " << M << "\n";
+    cout << "Key: " << K << "\n";
+    cout << "Ciphered Text: " << C << "\n";
+
+    cout << "-----------------------\n";
+
+    C = "Vszz}:.e}!zr/.bvw.w.o|}#vs!.#s#.{s""ous.t}!.#vs.vwt#.qw~vs!.$w|u.OaQWW.qvo!oq#s!<";
+    K = 14;
+
+    M = decipher(C, K);
+    
+    cout << "Ciphered Text: " << C << "\n";
+    cout << "Key: " << K << "\n";
+    cout << "Decipheared Text: " << M << "\n";
 
     return 0;
 }
