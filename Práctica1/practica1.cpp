@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
-#include <ctime>  
+#include <ctime>
 #include <map>
 
 using namespace std;
@@ -15,31 +15,38 @@ vector<char> alphabetVector;
 map<char, int> alphabetMap;
 
 // Function that prints the Multiplication Table
-void mulTable(int n) {
-    if(n < 2 || n > 50) {
+void mulTable(int n)
+{
+    if (n < 2 || n > 50)
+    {
         cout << "Invalid value.\n";
-        return; 
-    }    
+        return;
+    }
 
-    cout << "Multiplication table for Z_" << n  << ":\n" << "*\t";
+    cout << "Multiplication table for Z_" << n << ":\n"
+         << "*\t";
 
-    for(int x = 1; x < n; x++) {
+    for (int x = 1; x < n; x++)
+    {
         cout << x << "\t";
     }
 
     cout << "\n";
 
-    for(int x = 1; x < n; x++) {
+    for (int x = 1; x < n; x++)
+    {
         cout << x << "\t";
-        for(int y = 1; y < n; y++) {
+        for (int y = 1; y < n; y++)
+        {
             cout << (x * y) % n << "\t";
         }
         cout << "\n";
     }
 }
 
-// Select a random even number 
-int selectEven() {
+// Select a random even number
+int selectEven()
+{
     int x;
 
     x = (rand() % 25) * 2 + 2;
@@ -47,8 +54,9 @@ int selectEven() {
     return x;
 }
 
-// Select a random odd number 
-int selectOdd() {
+// Select a random odd number
+int selectOdd()
+{
     int x;
 
     x = (rand() % 25) * 2 + 1;
@@ -57,14 +65,22 @@ int selectOdd() {
 }
 
 // Implementation of the Shift Cipher
-string encipher(string M, int K){
+string encipher(string M, int K)
+{
     string C = "";
     int n = alphabetVector.size();
 
-    for(char mi : M) {
+    if (K > alphabetVector.size())
+    {
+        return "The key can't be greather than Zn.";
+    }
+
+    for (char mi : M)
+    {
         auto codificated = alphabetMap.find(mi);
 
-        if(codificated == alphabetMap.end()) {
+        if (codificated == alphabetMap.end())
+        {
             return "There's a character that doesn't belong in the alphabet.";
         }
 
@@ -77,24 +93,35 @@ string encipher(string M, int K){
 }
 
 // Implementation of the Shift Decipher
-string decipher(string C, int K){
+string decipher(string C, int K)
+{
     string M = "";
     int n = alphabetVector.size();
 
-    for(char ci : C) {
+    if (K > alphabetVector.size())
+    {
+        return "The key can't be greather than Zn.";
+    }
+
+    for (char ci : C)
+    {
         auto deciphered = alphabetMap.find(ci);
 
-        if(deciphered == alphabetMap.end()) {
+        if (deciphered == alphabetMap.end())
+        {
             return "There's a character that doesn't belong in the alphabet.";
         }
 
         int mi = 0;
 
-        if((deciphered->second - K) < 0){
+        if ((deciphered->second - K) < 0)
+        {
             mi = (n + (deciphered->second) - K) % n;
-        } else {
+        }
+        else
+        {
             mi = (deciphered->second - K) % n;
-        }        
+        }
 
         M += alphabetVector[mi];
     }
@@ -103,17 +130,18 @@ string decipher(string C, int K){
 }
 
 // English Alphabet Test
-void testEnglishAlphabet() {
+void testEnglishAlphabet()
+{
     alphabetVector.clear();
     alphabetMap.clear();
 
     string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for (int i = 0; i < alphabet.size(); i++) {
+    for (int i = 0; i < alphabet.size(); i++)
+    {
         alphabetVector.push_back(alphabet[i]);
         alphabetMap[alphabet[i]] = i;
     }
 
-    cin.ignore();
     string M, C;
     int K;
 
@@ -136,16 +164,17 @@ void testEnglishAlphabet() {
 }
 
 // Printable ASCII Alphabet
-void testASCIIAlphabet() {
+void testASCIIAlphabet()
+{
     alphabetVector.clear();
     alphabetMap.clear();
 
-    for (int i = 32; i < 127; i++) {
+    for (int i = 32; i < 127; i++)
+    {
         alphabetVector.push_back((char)i);
         alphabetMap[(char)i] = alphabetVector.size() - 1;
     }
 
-    cin.ignore();
     string M, C;
     int K;
 
@@ -168,7 +197,8 @@ void testASCIIAlphabet() {
 }
 
 // Random Alphabet Test
-void testRandomAlphabet() {
+void testRandomAlphabet()
+{
     alphabetVector.clear();
     alphabetMap.clear();
 
@@ -178,8 +208,10 @@ void testRandomAlphabet() {
     cout << "\n";
 
     char r;
-    for (int i = 0; i < n; i++) {
-        do {
+    for (int i = 0; i < n; i++)
+    {
+        do
+        {
             r = (char)(rand() % (127 - 32 + 1) + 32);
         } while (alphabetMap.find(r) != alphabetMap.end());
 
@@ -188,7 +220,8 @@ void testRandomAlphabet() {
     }
 
     cout << "Alphabet: ";
-    for (auto c : alphabetVector) cout << c;
+    for (auto c : alphabetVector)
+        cout << c;
     cout << "\n-----------------------\n";
 
     cin.ignore();
@@ -213,7 +246,8 @@ void testRandomAlphabet() {
     cout << "-----------------------\n";
 }
 
-int main() {
+int main()
+{
     srand(time(0));
 
     // Multiplication Tables
