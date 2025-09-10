@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <map>
+#include <fstream>
 
 using namespace std;
 
@@ -15,32 +16,32 @@ vector<char> alphabetVector;
 map<char, int> alphabetMap;
 
 // Function that prints the Multiplication Table
-void mulTable(int n)
+void mulTable(int n, ofstream& outFile)
 {
     if (n < 2 || n > 50)
     {
-        cout << "Invalid value.\n";
+        outFile << "Invalid value.\n";
         return;
     }
 
-    cout << "Multiplication table for Z_" << n << ":\n"
+    outFile << "Multiplication table for Z_" << n << ":\n"
          << "*\t";
 
     for (int x = 1; x < n; x++)
     {
-        cout << x << "\t";
+        outFile << x << "\t";
     }
 
-    cout << "\n";
+    outFile << "\n";
 
     for (int x = 1; x < n; x++)
     {
-        cout << x << "\t";
+        outFile << x << "\t";
         for (int y = 1; y < n; y++)
         {
-            cout << (x * y) % n << "\t";
+            outFile << (x * y) % n << "\t";
         }
-        cout << "\n";
+        outFile << "\n";
     }
 }
 
@@ -250,10 +251,13 @@ int main()
 {
     srand(time(0));
 
+    ofstream tablesFile;
+    tablesFile.open("multiplication_tables.txt");
+
     // Multiplication Tables
-    mulTable(selectEven());
-    mulTable(selectOdd());
-    mulTable(primeNum[rand() % primeNum.size()]);
+    mulTable(selectEven(), tablesFile);
+    mulTable(selectOdd(), tablesFile);
+    mulTable(primeNum[rand() % primeNum.size()], tablesFile);
 
     cout << "-----------------------\n";
 
