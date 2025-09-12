@@ -1,5 +1,5 @@
 // Lab 01. Modular Arithmetic
-// By: López Reyes José Roberto. 6CV2.
+// By: López Reyes José Roberto. 6CV4.
 
 #include <iostream>
 #include <vector>
