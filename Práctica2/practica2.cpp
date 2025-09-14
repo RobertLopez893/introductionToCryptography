@@ -7,6 +7,8 @@
 #include <map>
 #include <numeric>
 #include <algorithm>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -77,8 +79,25 @@ int find_b(int n, int a)
     return b;
 }
 
+// Key Generator
+vector<int> key_gen(int n) {
+    vector<int> key(2);
+    int a, b;
+    vector<int> Zn = Zestrella(n);
+    
+    a = Zn[rand() % Zn.size()];
+    b = rand() % n;
+
+    key[0] = a;
+    key[1] = b;
+
+    return key;
+}
+
 int main()
 {
+    srand(time(0));
+
     fill_alphabet();
     n = 27;
 
@@ -92,6 +111,10 @@ int main()
     int a = 2;
     int b = find_b(n, a);
     cout << "\nThe b for " << a << " is " << b;
+
+    vector<int> key = key_gen(n);
+
+    cout << "\nThe key is (" << key[0] << ", " << key[1] << ")";
 
     return 0;
 }
