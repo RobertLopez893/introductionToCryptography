@@ -9,19 +9,21 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 
 using namespace std;
 
-vector<char> alfabetoActual;
+vector<char> alphabetVector;
 map<char, int> alphabetMap;
-int n, tamAlfa;
 
 // Fills with the ASCII characters manually
 void fill_alphabet()
 {
     for (int i = 32; i <= 126; ++i)
-        alfabetoActual.push_back(static_cast<char>(i));
-    tamAlfa = 95;
+    {
+        alphabetVector.push_back(static_cast<char>(i));
+        alphabetMap[(char)i] = alphabetVector.size() - 1;
+    }
 }
 
 // Greatest Common Divisor
@@ -97,27 +99,144 @@ vector<int> key_gen(int n)
     return key;
 }
 
+// Affine Cipher Enciphering
+string encipher(string M, vector<int> K)
+{
+    string C = "";
+    int n = alphabetVector.size();
+
+    for (char mi : M)
+    {
+        auto codificated = alphabetMap.find(mi);
+
+        if (codificated == alphabetMap.end())
+        {
+            return "There's a character that doesn't belong in the alphabet.";
+        }
+
+        int ci = ((K[0] * codificated->second) + K[1]) % n;
+
+        C += alphabetVector[ci];
+    }
+
+    return C;
+}
+
+// Affine Cipher Deciphering
+string decipher(string C, vector<int> K)
+{
+    string M = "";
+    int n = alphabetVector.size();
+
+    for (char ci : C)
+    {
+        auto decodificated = alphabetMap.find(ci);
+
+        if (decodificated == alphabetMap.end())
+        {
+            return "There's a character that doesn't belong in the alphabet.";
+        }
+
+        int mi = (decodificated->second - K[1]) * find_b(n, K[0]);
+
+        if (mi < 0)
+        {
+            mi = (mi % n + n) % n;
+        }
+        else
+        {
+            mi = mi % n;
+        }
+
+        M += alphabetVector[mi];
+    }
+
+    return M;
+}
+
+// Generate all possible keys
+void gen_all_keys(int n, ofstream &outFile)
+{
+    vector<int> Zn = Zestrella(n);
+
+    outFile << "All possible keys for n = " << n << ":\n";
+
+    for (int a : Zn)
+    {
+        for (int b = 0; b < n; ++b)
+        {
+            outFile << "(" << a << ", " << b << ")\n";
+            outFile << find_b(n, a) << " mod " << n << " = " << (find_b(n, a)) % n << "\n";
+        }
+    }
+}
+
+// Function for the Ciphering Person
+void bob(int n)
+{
+    vector<int> K = key_gen(n);
+
+    ofstream key;
+    key.open("ciphering_key.txt");
+
+    key << "Key: (" << K[0] << ", " << K[1] << ")";
+
+    string M;
+    cout << "Insert the plaintext: ";
+    getline(cin, M);
+
+    string C = encipher(M, K);
+    key << "\nCiphered Text: " << C;
+}
+
+// Function for the Deciphering Person
+void alice(int n) {
+    int a, b;
+    string C, M;
+
+    cout << "Enter the a of the key: ";
+    cin >> a;
+
+    cin.ignore();
+
+    cout << "Enter the b of the key: ";
+    cin >> b;
+
+    cin.ignore();
+
+    cout << "Enter the ciphered text: ";
+    getline(cin, C);
+
+    vector<int> K(2);
+    K[0] = a;
+    K[1] = b;
+
+    M = decipher(C, K);
+
+    ofstream key;
+    key.open("deciphering_key.txt");
+
+    key << "Key: (" << K[0] << ", " << K[1] << ")";
+    key << "\nDeciphered Text: " << M;
+}
+
 int main()
 {
     srand(time(0));
 
     fill_alphabet();
-    n = 27;
 
-    vector<int> Zn = Zestrella(n);
+    ofstream possibleKeys;
+    possibleKeys.open("possible_keys.txt");
 
-    cout << "Z*" << n << ": ";
+    int n = alphabetVector.size();
+    gen_all_keys(n, possibleKeys);
 
-    for (int i = 0; i < Zn.size(); i++)
-        cout << Zn[i] << "\t";
+    // Ciphering Person
+    bob(n);
 
-    int a = 2;
-    int b = find_b(n, a);
-    cout << "\nThe b for " << a << " is " << b;
-
-    vector<int> key = key_gen(n);
-
-    cout << "\nThe key is (" << key[0] << ", " << key[1] << ")";
+    // Deciphering Person
+    alice(n);
 
     return 0;
 }
