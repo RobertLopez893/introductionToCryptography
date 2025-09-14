@@ -1,5 +1,5 @@
 // Lab 02. Affine Cipher
-// By: López Reyes José Roberto. 6CV4.
+// By: López Reyes José Roberto and Hernández Zamora Alejandro. 6CV4.
 
 #include <iostream>
 #include <vector>
@@ -63,14 +63,16 @@ int find_b(int n, int a)
     int b;
     vector<int> Zn = Zestrella(n);
 
-    if (n < 2 || find(Zn.begin(), Zn.end(),a) == Zn.end())
+    if (n < 2 || find(Zn.begin(), Zn.end(), a) == Zn.end())
     {
         cout << "\nAn error occured that can't let the program continue.\n";
         return -1;
     }
 
-    for(int i = 0; i < Zn.size(); i++) {
-        if(((a * Zn[i]) % n) == 1) {
+    for (int i = 0; i < Zn.size(); i++)
+    {
+        if (((a * Zn[i]) % n) == 1)
+        {
             b = Zn[i];
             break;
         }
@@ -80,11 +82,12 @@ int find_b(int n, int a)
 }
 
 // Key Generator
-vector<int> key_gen(int n) {
+vector<int> key_gen(int n)
+{
     vector<int> key(2);
     int a, b;
     vector<int> Zn = Zestrella(n);
-    
+
     a = Zn[rand() % Zn.size()];
     b = rand() % n;
 
@@ -107,7 +110,7 @@ int main()
 
     for (int i = 0; i < Zn.size(); i++)
         cout << Zn[i] << "\t";
-    
+
     int a = 2;
     int b = find_b(n, a);
     cout << "\nThe b for " << a << " is " << b;
