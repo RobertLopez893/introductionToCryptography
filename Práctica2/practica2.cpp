@@ -174,50 +174,68 @@ void gen_all_keys(int n, ofstream &outFile)
 // Function for the Ciphering Person
 void bob(int n)
 {
-    vector<int> K = key_gen(n);
-
-    ofstream key;
-    key.open("ciphering_key.txt");
-
-    key << "Key: (" << K[0] << ", " << K[1] << ")";
-
+    cout << "--- Ciphering ---\n";
     string M;
     cout << "Insert the plaintext: ";
     getline(cin, M);
 
+    vector<int> K = key_gen(n);
     string C = encipher(M, K);
-    key << "\nCiphered Text: " << C;
+    
+    ofstream keyFile("key.txt");
+    if (!keyFile.is_open()) {
+        cerr << "Error: Could not open key.txt for writing.\n";
+        return;
+    }
+    keyFile << K[0] << " " << K[1];
+    keyFile.close();
+
+    ofstream cipherFile("ciphertext.txt");
+    if (!cipherFile.is_open()) {
+        cerr << "Error: Could not open ciphertext.txt for writing.\n";
+        return;
+    }
+    cipherFile << C;
+    cipherFile.close();
+
+    cout << "\nPlaintext ciphered successfully." << endl;
+    cout << "-> Key saved to key.txt" << endl;
+    cout << "-> Ciphertext saved to ciphertext.txt" << endl;
+    cout << "-----------------------\n\n";
 }
 
 // Function for the Deciphering Person
-void alice(int n) {
-    int a, b;
+void alice(int n)
+{
+    cout << "--- Deciphering ---\n";
+    vector<int> K(2);
     string C, M;
 
-    cout << "Enter the a of the key: ";
-    cin >> a;
+    ifstream keyFile("key.txt");
+    if (!keyFile.is_open()) {
+        cerr << "Error: Could not find key.txt to read the key.\n";
+        return;
+    }
+    keyFile >> K[0] >> K[1];
+    keyFile.close();
+    cout << "-> Key (" << K[0] << ", " << K[1] << ") read from key.txt" << endl;
 
-    cin.ignore();
-
-    cout << "Enter the b of the key: ";
-    cin >> b;
-
-    cin.ignore();
-
-    cout << "Enter the ciphered text: ";
+    cout << "\nEnter the ciphered text to decipher: ";
     getline(cin, C);
-
-    vector<int> K(2);
-    K[0] = a;
-    K[1] = b;
 
     M = decipher(C, K);
 
-    ofstream key;
-    key.open("deciphering_key.txt");
+    ofstream resultFile("deciphered_text.txt");
+     if (!resultFile.is_open()) {
+        cerr << "Error: Could not open deciphered_text.txt for writing.\n";
+        return;
+    }
+    resultFile << "Recovered Plaintext: " << M;
+    resultFile.close();
 
-    key << "Key: (" << K[0] << ", " << K[1] << ")";
-    key << "\nDeciphered Text: " << M;
+    cout << "\nText deciphered successfully." << endl;
+    cout << "-> Result saved to deciphered_text.txt" << endl;
+    cout << "-------------------------\n";
 }
 
 int main()
