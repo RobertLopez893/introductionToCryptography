@@ -11,6 +11,7 @@
 
 using namespace std;
 
+// Extended Euclidean Algorithm (EEA)
 vector<int> extendedEuclideanAlgorithm(int r0, int r1)
 {
     if (r0 < r1)
@@ -48,6 +49,7 @@ vector<int> extendedEuclideanAlgorithm(int r0, int r1)
     return {r[i - 1], s[i - 1], t[i - 1]};
 }
 
+// Pair generator for testing purposes
 vector<int> gen_pairs()
 {
     int a, b;
