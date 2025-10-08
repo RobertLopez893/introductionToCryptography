@@ -282,7 +282,7 @@ int main()
     gen_all_keys(n, possibleKeys);
 
     // Ciphering Person
-    bob(n);
+    // bob(n);
 
     // Deciphering Person
     alice(n);
