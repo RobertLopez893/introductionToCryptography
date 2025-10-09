@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <random>
 #include <numeric>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -70,31 +72,79 @@ string perm_cipher(string M, vector<int> P)
     return C;
 }
 
+// Checks if the permutation is valid
+bool is_valid_permutation(const vector<int>& p)
+{
+    int n = p.size();
+    if (n == 0) {
+        return false;
+    }
+    vector<int> sorted_p = p;
+    sort(sorted_p.begin(), sorted_p.end());
+    for (int i = 0; i < n; ++i) {
+        if (sorted_p[i] != i) {
+            return false; // Checks for missing numbers or duplicates
+        }
+    }
+    return true;
+}
+
 int main()
 {
-    int n = 6;
-    vector<int> P = gen_perm(n);
+    string in_filename;
+    cout << "Enter the name of the text file to encrypt: ";
+    cin >> in_filename;
 
-    cout << "Permutation: [ ";
+    ifstream input_file(in_filename);
+    if (!input_file.is_open())
+    {
+        cerr << "Error: Could not open file '" << in_filename << "'." << endl;
+        return 1;
+    }
+
+    stringstream buffer;
+    buffer << input_file.rdbuf();
+    string M = buffer.str();
+    input_file.close();
+
+    cout << "Successfully loaded message from " << in_filename << "." << endl;
+
+    int n;
+    cout << "\nEnter the size of the permutation key: ";
+    cin >> n;
+
+    if (n < 3) {
+        cerr << "Error: Permutation size must be greater or equal to 3." << endl;
+        return 1;
+    }
+
+    vector<int> P(n);
+    cout << "Enter the " << n << " elements of the permutation (example: 2 0 1 for size 3):" << endl;
     for (int i = 0; i < n; i++)
     {
-        cout << P[i] << " ";
+        cin >> P[i];
     }
-    cout << "]" << endl;
 
-    string M = "Mario! Bors?";
+    if (!is_valid_permutation(P)) {
+        cerr << "Invalid permutation provided." << endl;
+        return 1;
+    }
 
+    cout << "Encrypting..." << endl;
     string C = perm_cipher(M, P);
 
-    cout << "Plaintext: " << M << endl;
-    cout << "Ciphertext: " << C << endl;
+    string out_filename = "ciphertext";
+    ofstream output_file(out_filename);
+    if (!output_file.is_open())
+    {
+        cerr << "Error: Could not create output file '" << out_filename << "'." << endl;
+        return 1;
+    }
 
-    P = inverse_permutation(P);
-
-    M = perm_cipher(C, P);
-
-    cout << "Ciphertext: " << C << endl;
-    cout << "Plaintext: " << M << endl;
+    output_file << C;
+    output_file.close();
+    
+    cout << "Ciphertext saved in: " << out_filename << endl;
 
     return 0;
 }
