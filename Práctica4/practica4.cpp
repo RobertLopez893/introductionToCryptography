@@ -50,6 +50,14 @@ vector<int> inverse_permutation(vector<int> perm)
 string perm_cipher(string M, vector<int> P)
 {
     string C;
+    int key_size = P.size();
+
+    int padding_needed = (key_size - (M.size() % key_size)) % key_size;
+
+    if (padding_needed > 0)
+    {
+        M.append(padding_needed, '$');
+    }
 
     if (M.size() % P.size() != 0)
     {
@@ -133,7 +141,7 @@ int main()
     cout << "Encrypting..." << endl;
     string C = perm_cipher(M, P);
 
-    string out_filename = "ciphertext";
+    string out_filename = "ciphertext.pi";
     ofstream output_file(out_filename);
     if (!output_file.is_open())
     {
