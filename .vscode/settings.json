@@ -49,6 +49,7 @@
         "xutility": "cpp",
         "algorithm": "cpp",
         "numeric": "cpp",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "time.h": "c"
     }
 }
