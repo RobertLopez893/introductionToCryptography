@@ -48,7 +48,7 @@ void print_hex(char *S, int n)
 
 // Saves the S Function in a file
 void save_s_file(int *S, const char *filename)
-{    
+{
     FILE *file = fopen(filename, "w");
 
     if (file == NULL)
@@ -91,9 +91,10 @@ void gen_function()
 
 // Substitute the block of 4 bits
 char *substitution(char *M, int *S, int n)
-{    
+{
     char *C = (char *)malloc((n + 1) * sizeof(char));
-    if (C == NULL) {
+    if (C == NULL)
+    {
         printf("An error has ocurred.\n");
         return NULL;
     }
@@ -109,33 +110,34 @@ char *substitution(char *M, int *S, int n)
         int nuevo_der = S[nibble_der];
 
         C[i] = (nuevo_izq << 4) | nuevo_der;
-        
+
         printf("Byte[%d]: 0x%02X -> (H:%X, L:%X) -> S(H):%X, S(L):%X -> Nuevo: 0x%02X\n",
                i, byte_original, nibble_izq, nibble_der, nuevo_izq, nuevo_der, (unsigned char)C[i]);
     }
-    
+
     C[n] = '\0';
     return C;
 }
 
 // Load the function from the text file
 int *load_s_file(const char *filename)
-{    
+{
     FILE *file = fopen(filename, "r");
-    
+
     if (file == NULL)
     {
         printf("Error: Couldn't open %s for reading.\n", filename);
         return NULL;
     }
-    
+
     int *S = (int *)malloc(16 * sizeof(int));
-    if (S == NULL) {
+    if (S == NULL)
+    {
         printf("Error: Memory allocation failed while loading S-Box.\n");
         fclose(file);
         return NULL;
     }
-    
+
     printf("\nLoading the S function from %s.\n", filename);
     for (int i = 0; i < 16; i++)
     {
@@ -199,9 +201,9 @@ int main()
 
     printf("\n----- Programming Excercises 2 -----\n");
 
-    gen_function();    
+    gen_function();
 
-    int* S = load_s_file("s_function.txt");
+    int *S = load_s_file("s_function.txt");
 
     printf("\nRandom S Function Generated: ");
 
@@ -227,9 +229,10 @@ int main()
 
     int n2 = strlen(M2);
 
-    char* M_substituted = substitution(M2, S, n2);
+    char *M_substituted = substitution(M2, S, n2);
 
-    if (M_substituted != NULL) {
+    if (M_substituted != NULL)
+    {
         printf("\nOriginal Message: ");
         print_hex(M2, n2);
         printf("Ciphered Text: ");
