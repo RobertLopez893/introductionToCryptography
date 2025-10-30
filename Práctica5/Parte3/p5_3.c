@@ -129,6 +129,38 @@ unsigned int load_key(const char *filename)
     return K;
 }
 
+// Substitute the block of 4 bits
+unsigned char substitution(unsigned char M, int *S)
+{
+    int nibble_izq = (M >> 4) & 0x0F;
+    int nibble_der = M & 0x0F;       
+    
+    int nuevo_izq  = S[nibble_izq];
+    int nuevo_der  = S[nibble_der];
+    
+    return (unsigned char)((nuevo_izq << 4) | nuevo_der);
+}
+
+// Toy Encryption Algorithm
+unsigned char cipher(unsigned char M, unsigned int K, int *S) {
+    unsigned char C;
+
+    unsigned char k[4];
+    k[0] = (K >> 24) & 0xFF;
+    k[1] = (K >> 16) & 0xFF;
+    k[2] = (K >> 8) & 0xFF;
+    k[3] = K & 0xFF;
+
+    for (int i = 0; i < 3; i++)
+    {
+        M = M ^ k[i];
+        M = substitution(M, S);
+    }
+
+    C = M ^ k[3];
+    return C;
+}
+
 int main()
 {
     srand(time(NULL));
@@ -154,6 +186,14 @@ int main()
     unsigned int K = load_key(key_name);
     int *S = load_s_file(sbox_name);
     
+    unsigned char M;
+
+    printf("\nEnter a single printable ASCII character: ");
+    scanf(" %c", &M);
+
+    unsigned char C = cipher(M, K, S);
+    printf("\nCiphered Character: %02X", C);
+
     free(S);
 
     return 0;
