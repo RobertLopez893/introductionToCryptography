@@ -3,7 +3,7 @@
 
 from Crypto.Cipher import DES3
 from Crypto.Random import get_random_bytes
-from Crypto.Util.Padding import pad
+from Crypto.Util.Padding import pad, unpad
 import base64
 
 
@@ -49,13 +49,13 @@ def cipher(key, plaintext):
     IV = get_random_bytes(8)
 
     # Creating Cipher Object
-    encrypt = DES3.new(K, DES3.MODE_CBC, IV)
+    encipher = DES3.new(K, DES3.MODE_CBC, IV)
 
     # Padding Data
     M = pad(M, DES3.block_size)
 
     # Encrypting
-    C = encrypt.encrypt(M)
+    C = encipher.encrypt(M)
 
     # Saving the IV Vector and the ciphertext
     final_output = IV + C
@@ -74,7 +74,49 @@ def cipher(key, plaintext):
 
 # 3DES Deciphering
 def decipher(key, ciphertext):
-    pass
+    # Reading key from file
+    try:
+        with open(key, "r") as file:
+            K = base64.b64decode(file.read())
+            print(f"Successfully opened {key}.")
+    except FileNotFoundError:
+        print(f"Error: The file {key} was not found.")
+    except Exception as e:
+        print(f"An error occurred as trying to read from the file: {e}")
+
+    # Reading ciphertext from file
+    try:
+        with open(ciphertext, "r") as file:
+            coded_input = file.read()
+            print(f"Successfully opened {ciphertext}.")
+    except FileNotFoundError:
+        print(f"Error: The file {ciphertext} was not found.")
+    except Exception as e:
+        print(f"An error occurred as trying to read from the file: {e}")
+
+    # Decoding and extracting the information
+    data_bytes = base64.b64decode(coded_input)
+    IV = data_bytes[:8]
+    C = data_bytes[8:]
+
+    # Creating Cipher Object
+    deciph = DES3.new(K, DES3.MODE_CBC, IV)
+
+    # Decrypt the data
+    M = deciph.decrypt(C)
+
+    # Unpadding the result
+    final_output = unpad(M, DES3.block_size)
+
+    # Store it all in a file
+    try:
+        with open("recovered_3des.txt", "wb") as file:
+            file.write(final_output)
+            print("Successfully saved in 'recovered_3des.txt'.")
+    except FileNotFoundError:
+        print("Error: The file was not able to be opened.")
+    except Exception as e:
+        print(f"There was an error writing into the file: {e}")
 
 
 # Ciphering person
@@ -87,8 +129,12 @@ def bob():
 
 # Deciphering person
 def alice():
-    pass
+    key = input("Enter the name of your textfile containing the key: ")
+    ciphertext = input("Enter the name of your textfile containing your ciphertext: ")
+
+    decipher(key, ciphertext)
 
 
 gen_key()
 bob()
+alice()
