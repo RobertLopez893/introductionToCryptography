@@ -137,4 +137,4 @@ def alice():
 
 gen_key()
 bob()
-alice()
+# alice()
