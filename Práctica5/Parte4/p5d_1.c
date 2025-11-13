@@ -1,3 +1,6 @@
+// Lab 05. Bit Permutation
+// By: López Reyes José Roberto. 6CV4.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
