@@ -6,6 +6,22 @@
 #include <time.h>
 #include <string.h>
 
+/* --- Print in Binary --- */
+
+// Print a value in binary
+void printBin(unsigned char byte) {
+    printf("Binary:     ");    
+    for (int i = 7; i >= 0; i--) {        
+        unsigned char bit = (byte >> i) & 1;
+        printf("%u", bit);
+                
+        if (i == 4) {
+            printf(" ");
+        }
+    }
+    printf("\n");
+}
+
 /* --- Cipher Key --- */
 
 // Generate a secret key K
@@ -133,6 +149,21 @@ void gen_function()
     free(S);
 }
 
+// Obtain the inverse Sbox
+void gen_inv_function(int *S)
+{
+    int *S_inv = (int *)malloc(16 * sizeof(int));
+
+    for (int z = 0; z < 16; ++z)
+    {
+        unsigned char valor = S[z];
+        S_inv[valor] = z;
+    }
+
+    save_s_file(S_inv, "s_box_inv.txt");
+    free(S_inv);
+}
+
 /* --- Permutation --- */
 
 // Swap two integers
@@ -205,6 +236,21 @@ void gen_perm(const char *filename) {
     free(P);
 }
 
+// Obtain the inverse Permutation
+void gen_inv_permn(int *P)
+{
+    int *P_inv = (int *)malloc(8 * sizeof(int));
+
+    for (int z = 0; z < 8; ++z)
+    {
+        int valor = P[z];
+        P_inv[valor - 1] = z + 1;
+    }
+
+    save_perm_file(P_inv, "perm_inv.txt");
+    free(P_inv);
+}
+
 /* --- Ciphering Operations --- */
 
 // Substitute the block of 4 bits
@@ -255,50 +301,129 @@ unsigned char cipher(unsigned char M, unsigned int K, int *S, int *P) {
     return C;
 }
 
-int main()
-{
-    srand(time(NULL));
+// Toy Decryption Algorithm
+unsigned char decipher(unsigned char C, unsigned int K, int *S, int *P) {
+    unsigned char M;
 
+    unsigned char k[4];
+    k[0] = (K >> 24) & 0xFF;
+    k[1] = (K >> 16) & 0xFF;
+    k[2] = (K >> 8) & 0xFF;
+    k[3] = K & 0xFF;
+
+    M = C ^ k[3];
+
+    for (int i = 2; i >= 0; i--)
+    {
+        M = permutation(M, P);
+        M = substitution(M, S); 
+        M = M ^ k[i];               
+    }
+
+    return M;
+}
+
+/* --- Ciphering and Deciphering flows --- */
+
+// Ciphering Person
+void bob() {
+    printf("\n--- BOB (Encryption) ---\n");
+        
     gen_key("key.txt");
     gen_function(); 
     gen_perm("perm.txt");   
+    
+    char key_name[256], sbox_name[256], perm_name[256];
 
-    char key_name[256];
-    char sbox_name[256];
-    char perm_name[256];
+    printf("Enter Key file: ");
+    if (fgets(key_name, sizeof(key_name), stdin)) key_name[strcspn(key_name, "\n")] = 0;
 
-    printf("\nEnter the name of your Key file: ");
+    printf("Enter S-box file: ");
+    if (fgets(sbox_name, sizeof(sbox_name), stdin)) sbox_name[strcspn(sbox_name, "\n")] = 0;
 
-    if (fgets(key_name, sizeof(key_name), stdin) != NULL) {
-        key_name[strcspn(key_name, "\n")] = '\0';
-    }
-
-    printf("\nEnter the name of your S-box file: ");
-
-    if (fgets(sbox_name, sizeof(sbox_name), stdin) != NULL) {
-        sbox_name[strcspn(sbox_name, "\n")] = '\0';
-    }
-
-    printf("\nEnter the name of your Permutation file: ");
-
-    if (fgets(perm_name, sizeof(perm_name), stdin) != NULL) {
-        perm_name[strcspn(perm_name, "\n")] = '\0';
-    }
-
+    printf("Enter Permutation file: ");
+    if (fgets(perm_name, sizeof(perm_name), stdin)) perm_name[strcspn(perm_name, "\n")] = 0;
+    
     unsigned int K = load_key(key_name);
     int *S = load_s_file(sbox_name);
     int *P = load_perm_file(perm_name);
     
+    if(S && P) {
+        gen_inv_function(S);
+        gen_inv_permn(P);
+    } else {
+        printf("Error loading files in Bob.\n");
+        return;
+    }
+
     unsigned char M;
-
-    printf("\nEnter a single printable ASCII character: ");
+    printf("Enter a single printable ASCII character: ");
     scanf(" %c", &M);
-
+    
+    while (getchar() != '\n'); 
+    
     unsigned char C = cipher(M, K, S, P);
-    printf("\nCiphered Character: %02X", C);
+    printf("\nCiphered Char: %c", C);
+    printf("\nCiphered Hex:  %02X\n", C);    
+    printBin(C);
 
     free(S);
     free(P);
+}
+
+// Deciphering Person
+void alice() {
+    printf("\n--- ALICE (Decryption) ---\n");
+    
+    unsigned char C;
+    printf("Enter a single printable ASCII character: ");
+    scanf(" %c", &C);
+
+    while (getchar() != '\n');
+
+    char key_name[256], sbox_inv_name[256], perm_inv_name[256];
+
+    printf("\nEnter Key file: ");
+    if (fgets(key_name, sizeof(key_name), stdin)) key_name[strcspn(key_name, "\n")] = 0;
+
+    printf("Enter Inverse S-box file: ");
+    if (fgets(sbox_inv_name, sizeof(sbox_inv_name), stdin)) sbox_inv_name[strcspn(sbox_inv_name, "\n")] = 0;
+
+    printf("Enter Inverse Permutation file: ");
+    if (fgets(perm_inv_name, sizeof(perm_inv_name), stdin)) perm_inv_name[strcspn(perm_inv_name, "\n")] = 0;
+    
+    unsigned int K = load_key(key_name);
+    int *S_inv = load_s_file(sbox_inv_name);
+    int *P_inv = load_perm_file(perm_inv_name);
+
+    if (!S_inv || !P_inv) {
+        printf("Error loading files in Alice.\n");
+        return;
+    }
+    
+    unsigned char recover = decipher(C, K, S_inv, P_inv);
+    
+    printf("\nRecovered Char: %c", recover);
+    printf("\nRecovered Hex:  %02X\n", recover); 
+    printBin(recover);
+
+    free(S_inv);
+    free(P_inv);
+}
+
+/* --- Main Function --- */
+
+int main()
+{
+    srand(time(NULL));
+
+    bob();
+
+    printf("\n-----------------------------------\n");
+    printf("   Transmission through channel...   ");
+    printf("\n-----------------------------------\n");
+
+    alice();
 
     return 0;
 }
