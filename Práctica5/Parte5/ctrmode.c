@@ -590,23 +590,29 @@ void bob()
     }
 
     size_t len = strlen(plaintext);
-    unsigned char *ciphertext = malloc(len);
-    if (!ciphertext)
+    unsigned char *buffer = malloc(len + 1);
+    if (!buffer)
     {
-        printf("Memory allocation error.\n");
+        printf("Memory Error.\n");
         free(S);
         free(P);
         return;
     }
 
-    printf("\nEncrypting \"%s\" (%zu bytes)...\n", plaintext, len);
+    unsigned char IV = rand() % 256;
+    buffer[0] = IV;
+
+    printf("\nEncrypting with IV: %02X\n", IV);
 
     for (size_t i = 0; i < len; i++)
     {
-        ciphertext[i] = cipher((unsigned char)plaintext[i], K, S, P);
+        unsigned char counter_val = IV + i;
+        unsigned char keystream_byte = cipher(counter_val, K, S, P);
+        buffer[i + 1] = (unsigned char)plaintext[i] ^ keystream_byte;
     }
 
-    char *b64_out = base64_encode(ciphertext, len);
+    char *b64_out = base64_encode(buffer, len + 1);
+
     if (b64_out)
     {
         printf("--------------------------------------------------\n");
@@ -614,21 +620,14 @@ void bob()
         printf("--------------------------------------------------\n");
 
         char out_filename[256];
-        printf("Enter filename to save this Ciphertext: ");
+        printf("Enter filename to save Ciphertext: ");
         if (fgets(out_filename, sizeof(out_filename), stdin))
-        {
             out_filename[strcspn(out_filename, "\n")] = 0;
-        }
         write_file_content(out_filename, b64_out);
-
         free(b64_out);
     }
-    else
-    {
-        printf("Error encoding Base64.\n");
-    }
 
-    free(ciphertext);
+    free(buffer);
     free(S);
     free(P);
 }
@@ -638,86 +637,85 @@ void alice()
 {
     printf("\n--- ALICE (Decryption) ---\n");
 
-    char key_name[256], sbox_inv_name[256], perm_inv_name[256];
+    char key_name[256], sbox_name[256], perm_name[256];
 
-    printf("\nEnter Key file: ");
+    printf("Enter Key file: ");
     if (fgets(key_name, sizeof(key_name), stdin))
         key_name[strcspn(key_name, "\n")] = 0;
-
-    printf("Enter Inverse S-box file: ");
-    if (fgets(sbox_inv_name, sizeof(sbox_inv_name), stdin))
-        sbox_inv_name[strcspn(sbox_inv_name, "\n")] = 0;
-
-    printf("Enter Inverse Permutation file: ");
-    if (fgets(perm_inv_name, sizeof(perm_inv_name), stdin))
-        perm_inv_name[strcspn(perm_inv_name, "\n")] = 0;
+    printf("Enter Standard S-box file: ");
+    if (fgets(sbox_name, sizeof(sbox_name), stdin))
+        sbox_name[strcspn(sbox_name, "\n")] = 0;
+    printf("Enter Standard Permutation file: ");
+    if (fgets(perm_name, sizeof(perm_name), stdin))
+        perm_name[strcspn(perm_name, "\n")] = 0;
 
     unsigned int K = load_key(key_name);
-    int *S_inv = load_s_file(sbox_inv_name);
-    int *P_inv = load_perm_file(perm_inv_name);
+    int *S = load_s_file(sbox_name);
+    int *P = load_perm_file(perm_name);
 
-    if (!S_inv || !P_inv || K == 0)
+    if (!S || !P || K == 0)
     {
-        printf("Error loading files in Alice. Ensure you have the INVERSE files.\n");
-        if (S_inv)
-            free(S_inv);
-        if (P_inv)
-            free(P_inv);
+        printf("Error: Files missing.\n");
+        if (S)
+            free(S);
+        if (P)
+            free(P);
         return;
     }
 
     char cipher_filename[256];
     char b64_input[2048];
 
-    printf("\nEnter the Ciphertext filename: ");
+    printf("Enter the Ciphertext filename: ");
     if (fgets(cipher_filename, sizeof(cipher_filename), stdin))
-    {
         cipher_filename[strcspn(cipher_filename, "\n")] = 0;
-    }
 
     if (!read_file_content(cipher_filename, b64_input, sizeof(b64_input)))
     {
-        free(S_inv);
-        free(P_inv);
+        free(S);
+        free(P);
         return;
     }
 
-    size_t cipher_len;
-    unsigned char *ciphertext = base64_decode(b64_input, strlen(b64_input), &cipher_len);
+    size_t total_len;
+    unsigned char *buffer = base64_decode(b64_input, strlen(b64_input), &total_len);
 
-    if (!ciphertext)
+    if (!buffer || total_len < 1)
     {
-        printf("Error: Invalid Base64 string inside file.\n");
-        free(S_inv);
-        free(P_inv);
+        printf("Error: Invalid Base64 or empty message.\n");
+        free(S);
+        free(P);
         return;
     }
 
-    char *recovered_plaintext = malloc(cipher_len + 1);
+    unsigned char IV = buffer[0];
+    size_t cipher_len = total_len - 1; 
+    char *recovered = malloc(cipher_len + 1);
 
-    printf("\nDeciphering %zu bytes...\n", cipher_len);
+    printf("\nExtracted IV: %02X. Decrypting %zu bytes...\n", IV, cipher_len);
+
     for (size_t i = 0; i < cipher_len; i++)
     {
-        recovered_plaintext[i] = decipher(ciphertext[i], K, S_inv, P_inv);
+        unsigned char counter_val = IV + i;
+        unsigned char keystream_byte = cipher(counter_val, K, S, P);
+        recovered[i] = buffer[i + 1] ^ keystream_byte;
     }
-    recovered_plaintext[cipher_len] = '\0';
+    recovered[cipher_len] = '\0';
 
     printf("--------------------------------------------------\n");
-    printf("Recovered Plaintext: %s\n", recovered_plaintext);
+    printf("Recovered Plaintext: %s\n", recovered);
     printf("--------------------------------------------------\n");
 
     char out_filename[256];
     printf("Enter filename to save Recovered Text: ");
     if (fgets(out_filename, sizeof(out_filename), stdin))
-    {
         out_filename[strcspn(out_filename, "\n")] = 0;
-    }
-    write_file_content(out_filename, recovered_plaintext);
+    write_file_content(out_filename, recovered);
 
-    free(ciphertext);
-    free(recovered_plaintext);
-    free(S_inv);
-    free(P_inv);
+    free(buffer);
+    free(recovered);
+    free(S);
+    free(P);
 }
 
 /* --- Main Function --- */
