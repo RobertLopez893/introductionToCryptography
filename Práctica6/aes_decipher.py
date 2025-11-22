@@ -39,13 +39,14 @@ def decipher(key, ciphertext):
     # Decrypt the data
     M = deciph.decrypt(C)
 
-    print(f"Recovered Plaintext: {M.decode('utf-8')}")
+    print("Decryption process finished.")
+    decipher_file = input("Enter the name of the recovered text file: ")
 
     # Store it all in a file
     try:
-        with open("recovered.txt", "wb") as file:
+        with open(decipher_file, "wb") as file:
             file.write(M)
-            print("Successfully saved in 'recovered.txt'.")
+            print(f"Successfully saved in '{decipher_file}'.")
     except FileNotFoundError:
         print("Error: The file was not able to be opened.")
     except Exception as e:
@@ -56,6 +57,8 @@ def decipher(key, ciphertext):
 
 # Ciphering person
 def alice():
+    print("--- AES Deciphering ---")
+
     key = input("Enter the name of your textfile containing the key: ")
     ciphertext = input("Enter the name of your textfile containing your ciphertext: ")
 

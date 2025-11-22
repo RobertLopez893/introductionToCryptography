@@ -35,14 +35,17 @@ def cipher(key, plaintext):
     aes_ciph = AES.new(K, AES.MODE_CTR, nonce=iv)
     C = aes_ciph.encrypt(M)
 
-    print(f"IV: {base64.b64encode(iv)}")
-    print(f"Ciphertext: {base64.b64encode(C)}")
+    # print(f"IV: {base64.b64encode(iv)}")
+    # print(f"Ciphertext: {base64.b64encode(C)}")
+
+    print("Encryption process finished.")
+    cipher_file = input("Enter the name of the ciphertext file: ")
 
     # Store it all in a file
     try:
-        with open("ciphertext.txt", "w") as file:
-            file.write(base64.b64encode(iv + C).decode('utf-8'))
-            print("Successfully saved in 'ciphertext.txt'.")
+        with open(cipher_file, "wb") as file:
+            file.write(base64.b64encode(iv + C))
+            print(f"Successfully saved in '{cipher_file}'.")
     except FileNotFoundError:
         print("Error: The file was not able to be opened.")
     except Exception as e:
@@ -53,6 +56,8 @@ def cipher(key, plaintext):
 
 # Ciphering person
 def bob():
+    print("--- AES Ciphering ---")
+
     key = input("Enter the name of your textfile containing the key: ")
     plaintext = input("Enter the name of your textfile containing your plaintext: ")
 
