@@ -15,7 +15,7 @@ def gen_key(bits, filename):
     # Generate the random key
     key = get_random_bytes(bits // 8)
     encoded_key = base64.b64encode(key)
-    # print(f"Key: {key.hex()}")
+    print(f"Key: {key.hex()}")
 
     # Store the key in a file
     try:

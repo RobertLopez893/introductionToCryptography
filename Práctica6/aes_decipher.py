@@ -1,7 +1,6 @@
 # Lab 06. AES-CTR
 # By: López Reyes José Roberto. 6CV4.
 
-from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 import base64
 
@@ -13,6 +12,7 @@ def decipher(key, ciphertext):
         with open(key, "r") as file:
             K = base64.b64decode(file.read())
             print(f"Successfully opened {key}.")
+            print(f"\nKey: {K}")
     except FileNotFoundError:
         print(f"Error: The file {key} was not found.")
     except Exception as e:
@@ -23,6 +23,7 @@ def decipher(key, ciphertext):
         with open(ciphertext, "r") as file:
             coded_input = file.read()
             print(f"Successfully opened {ciphertext}.")
+            print(f"\nCiphertext: {coded_input}")
     except FileNotFoundError:
         print(f"Error: The file {ciphertext} was not found.")
     except Exception as e:
@@ -33,11 +34,15 @@ def decipher(key, ciphertext):
     IV = data_bytes[:8]
     C = data_bytes[8:]
 
+    print(f"\nIV: {base64.b64encode(IV)}")
+    print(f"Ciphertext: {base64.b64encode(C)}")
+
     # Creating Cipher Object
     deciph = AES.new(K, AES.MODE_CTR, nonce=IV)
 
     # Decrypt the data
     M = deciph.decrypt(C)
+    print(f"\nRecovered Plaintext: {M}\n")
 
     print("Decryption process finished.")
     decipher_file = input("Enter the name of the recovered text file: ")

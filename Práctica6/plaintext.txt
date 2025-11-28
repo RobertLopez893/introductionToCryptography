@@ -1,1 +1,1 @@
-K-Means Clustering is one of the most widely used algorithms in unsupervised learning. Unlike supervised learning, where the model is fed "answers" (labels), K-Means is thrown into a dataset and asked to find structure on its own. Its primary goal is to partition $n$ observations into $k$ clusters in which each observation belongs to the cluster with the nearest mean (centroid).
+K-Means Clustering is one of the most widely used algorithms in unsupervised learning.

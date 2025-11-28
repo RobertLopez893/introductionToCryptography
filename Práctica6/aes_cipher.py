@@ -13,6 +13,7 @@ def cipher(key, plaintext):
         with open(key, "r") as file:
             K = base64.b64decode(file.read())
             print(f"Successfully opened {key}.")
+            print(f"\nKey: {K}")
     except FileNotFoundError:
         print(f"Error: The file {key} was not found.")
     except Exception as e:
@@ -23,6 +24,7 @@ def cipher(key, plaintext):
         with open(plaintext, "rb") as file:
             M = file.read()
             print(f"Successfully opened {plaintext}.")
+            print(f"\nPlaintext content: {M}")
     except FileNotFoundError:
         print(f"Error: The file {plaintext} was not found.")
     except Exception as e:
@@ -35,8 +37,8 @@ def cipher(key, plaintext):
     aes_ciph = AES.new(K, AES.MODE_CTR, nonce=iv)
     C = aes_ciph.encrypt(M)
 
-    # print(f"IV: {base64.b64encode(iv)}")
-    # print(f"Ciphertext: {base64.b64encode(C)}")
+    print(f"IV: {base64.b64encode(iv)}")
+    print(f"Ciphertext: {base64.b64encode(C)}")
 
     print("Encryption process finished.")
     cipher_file = input("Enter the name of the ciphertext file: ")
