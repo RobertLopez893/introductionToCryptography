@@ -726,14 +726,16 @@ int main()
 {
     srand(time(NULL));
 
-    generate_files_interactive();
-    generate_inverse_files_interactive();
+    //generate_files_interactive();
+    //generate_inverse_files_interactive();
 
-    bob();
+    // bob();
 
+    /*
     printf("\n-----------------------------------\n");
     printf("   Transmission through channel...   ");
     printf("\n-----------------------------------\n");
+    */
 
     alice();
 
