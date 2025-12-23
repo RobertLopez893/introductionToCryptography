@@ -76,7 +76,7 @@ def main():
 
     bits = int(input("Ingrese tamaño de los primos (64, 128, 256, 512 o 1024 bits): "))
 
-    # generar_primos()
+    generar_primos()
     generar_llaves_rsa(bits)
 
 
